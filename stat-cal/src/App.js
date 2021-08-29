@@ -8,7 +8,11 @@ class Stat extends Component {
         
         this.state = { 
             dataSet: '',
-            dataList: []
+            dataList: [],
+            total: 0,
+            mean: 0,
+            variance: 0,
+            standard_deviation: 0
          }
     }
 
@@ -24,19 +28,31 @@ class Stat extends Component {
         e.preventDefault();
         let temp = new Array();
 
-        console.log("haloo")
-
         temp = this.state.dataSet.split(",");
-        
+        let total = 0;
+        let mean;
+        let top = 0;
+
         for (var a in temp) {
             temp[a] =  parseFloat(temp[a])
+            total = total + temp[a]
         }
-        console.log(temp)
+
+        for (var a in temp) {
+            top = top + ((temp[a] -  total/temp.length)*(temp[a] -  total/temp.length));
+        }
+
+
         temp.sort((a, b) => a - b);
         console.log(temp)
 
+
         this.setState({
-            dataList: temp
+            dataList: temp,
+            total: total,
+            mean: total/temp.length,
+            variance: top/(temp.length-1),
+            standard_deviation: Math.sqrt(top/(temp.length-1))
           });
 
     }
@@ -53,7 +69,7 @@ class Stat extends Component {
                     {this.state.dataSet}
                 </form>
 
-                <FiveNumberSummary data={this.state.dataList}/>
+                <FiveNumberSummary data={this.state}/>
 
                     
             </div>
