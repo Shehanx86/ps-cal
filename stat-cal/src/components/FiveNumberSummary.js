@@ -22,41 +22,16 @@ export default class fiveNumberSummary extends Component {
         }
     }
 
-    // getVariance = () => {
-    //     let Array1 = this.props.data.dataList;
-    //     let top = 0;
-    //     let variance = 0;
-
-    //     for (var a in Array1) {
-    //         top = top + ((Array1[a] + this.props.data.mean)*(Array1[a] + this.props.data.mean))
-    //     }
-
-    //     variance = top/this.props.data.dataList.length
-
-    //     this.setState({
-    //         variance: variance,
-    //         standard_deviation: variance^0.5
-    //     })
-
-    // }
 
     getArray() {
-        let Array1 = this.props.data.dataList;
-        let top = 0;
-        let variance = 0;
+        let Array1 = this.state.dataList;
 
         for (var a in Array1) {
             Array1[a] = Array1[a] + ", ";
-            // top = top + ((Array1[a] + this.props.data.mean)*(Array1[a] + this.props.data.mean));
-            // console.log("hi" +top)
         }
-
-        // variance = top/this.props.data.dataList.length
 
         this.setState({
             Array1: Array1,
-            // variance: variance,
-            // standard_deviation: variance^0.5
         })
     }
 
@@ -65,7 +40,6 @@ export default class fiveNumberSummary extends Component {
         this.quartile();
         this.maxMinRange();
         this.getArray();
-        // this.getVariance();
     }
 
     getDecimal = (n) => {
@@ -77,9 +51,9 @@ export default class fiveNumberSummary extends Component {
     }
 
     quartile = () => {
-        let q_1_place = (this.props.data.dataList.length + 1)/4;
-        let q_2_place = (this.props.data.dataList.length + 1)/2;
-        let q_3_place = ((this.props.data.dataList.length + 1)*3)/4;
+        let q_1_place = (this.state.dataList.length + 1)/4;
+        let q_2_place = (this.state.dataList.length + 1)/2;
+        let q_3_place = ((this.state.dataList.length + 1)*3)/4;
 
         let q_1_decimal = this.getDecimal(q_1_place);
         let q_1_whole = this.getWhole(q_1_place);
@@ -92,14 +66,14 @@ export default class fiveNumberSummary extends Component {
         
         let Q1,Q2,Q3;
 
-        if(this.props.data.dataList.length%2==0){
-            Q1 = this.props.data.dataList[q_1_whole - 1] + (q_1_decimal * (this.props.data.dataList[q_1_whole] - this.props.data.dataList[q_1_whole - 1]));
-            Q2 = this.props.data.dataList[q_2_whole - 1] + (q_2_decimal * (this.props.data.dataList[q_2_whole] - this.props.data.dataList[q_2_whole - 1]));
-            Q3 = this.props.data.dataList[q_3_whole - 1] + (q_3_decimal * (this.props.data.dataList[q_3_whole] - this.props.data.dataList[q_3_whole - 1]));
+        if(this.state.dataList.length%2==0){
+            Q1 = this.state.dataList[q_1_whole - 1] + (q_1_decimal * (this.state.dataList[q_1_whole] - this.state.dataList[q_1_whole - 1]));
+            Q2 = this.state.dataList[q_2_whole - 1] + (q_2_decimal * (this.state.dataList[q_2_whole] - this.state.dataList[q_2_whole - 1]));
+            Q3 = this.state.dataList[q_3_whole - 1] + (q_3_decimal * (this.state.dataList[q_3_whole] - this.state.dataList[q_3_whole - 1]));
         } else {
-            Q1 = this.props.data.dataList[q_1_whole - 1];
-            Q2 = this.props.data.dataList[q_2_whole - 1];
-            Q3 = this.props.data.dataList[q_3_whole - 1];
+            Q1 = this.state.dataList[q_1_whole - 1];
+            Q2 = this.state.dataList[q_2_whole - 1];
+            Q3 = this.state.dataList[q_3_whole - 1];
         }
 
         let skewness 
@@ -125,16 +99,16 @@ export default class fiveNumberSummary extends Component {
 
     maxMinRange = () => {
         
-        let newMin = this.props.data.dataList[0];
-        let newMax = this.props.data.dataList[0];
+        let newMin = this.state.dataList[0];
+        let newMax = this.state.dataList[0];
 
-        for ( let i = 0; i < this.props.data.dataList.length; i++ ) {
+        for ( let i = 0; i < this.state.dataList.length; i++ ) {
 
-            if(newMin > this.props.data.dataList[i]) {
-                newMin = this.props.data.dataList[i];
+            if(newMin > this.state.dataList[i]) {
+                newMin = this.state.dataList[i];
             }
-            if(newMax < this.props.data.dataList[i]) {
-                newMax = this.props.data.dataList[i];
+            if(newMax < this.state.dataList[i]) {
+                newMax = this.state.dataList[i];
             }
         }
 
@@ -167,16 +141,16 @@ export default class fiveNumberSummary extends Component {
                         <dd className="col-sm-9">{this.state.range}</dd>
 
                         <dt className="col-sm-3">Total</dt>
-                        <dd className="col-sm-9">{this.props.data.total}</dd>
+                        <dd className="col-sm-9">{this.state.total}</dd>
 
                         <dt className="col-sm-3">Mean</dt>
-                        <dd className="col-sm-9">{this.props.data.mean}</dd>
+                        <dd className="col-sm-9">{this.state.mean}</dd>
 
                         <dt className="col-sm-3">Variance</dt>
-                        <dd className="col-sm-9">{this.props.data.variance}</dd>
+                        <dd className="col-sm-9">{this.state.variance}</dd>
 
                         <dt className="col-sm-3">Standerd deviation</dt>
-                        <dd className="col-sm-9">{this.props.data.standard_deviation}</dd>
+                        <dd className="col-sm-9">{this.state.standard_deviation}</dd>
 
                         <dt className="col-sm-3">Q1</dt>
                         <dd className="col-sm-9">{this.state.Q1}</dd>

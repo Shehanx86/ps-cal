@@ -1,11 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
+import FrequencyTable from './components/FrequencyTable';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <App/>
+    <br/>
+    <FrequencyTable/>
   </React.StrictMode>,
   document.getElementById('root')
 );
