@@ -44,7 +44,6 @@ class Stat extends Component {
 
 
         temp.sort((a, b) => a - b);
-        console.log(temp)
 
 
         this.setState({

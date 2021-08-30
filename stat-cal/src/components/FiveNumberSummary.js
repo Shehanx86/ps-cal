@@ -89,10 +89,20 @@ export default class fiveNumberSummary extends Component {
 
         let q_3_decimal = this.getDecimal(q_3_place);
         let q_3_whole = this.getWhole(q_3_place);
+        
+        let Q1,Q2,Q3;
 
-        let Q1 = this.props.data.dataList[q_1_whole - 1] + (q_1_decimal * (this.props.data.dataList[q_1_whole] - this.props.data.dataList[q_1_whole - 1]));
-        let Q2 = this.props.data.dataList[q_2_whole - 1] + (q_2_decimal * (this.props.data.dataList[q_2_whole] - this.props.data.dataList[q_2_whole - 1]));
-        let Q3 = this.props.data.dataList[q_3_whole - 1] + (q_3_decimal * (this.props.data.dataList[q_3_whole] - this.props.data.dataList[q_3_whole - 1]));
+        if(this.props.data.dataList.length%2==0){
+            Q1 = this.props.data.dataList[q_1_whole - 1] + (q_1_decimal * (this.props.data.dataList[q_1_whole] - this.props.data.dataList[q_1_whole - 1]));
+            Q2 = this.props.data.dataList[q_2_whole - 1] + (q_2_decimal * (this.props.data.dataList[q_2_whole] - this.props.data.dataList[q_2_whole - 1]));
+            Q3 = this.props.data.dataList[q_3_whole - 1] + (q_3_decimal * (this.props.data.dataList[q_3_whole] - this.props.data.dataList[q_3_whole - 1]));
+        } else {
+            Q1 = this.props.data.dataList[q_1_whole - 1];
+            Q2 = this.props.data.dataList[q_2_whole - 1];
+            Q3 = this.props.data.dataList[q_3_whole - 1];
+        }
+
+        console.log(this.props.data.dataList[q_3_whole - 1])
 
         let skewness 
 
@@ -124,7 +134,6 @@ export default class fiveNumberSummary extends Component {
 
             if(newMin > this.props.data.dataList[i]) {
                 newMin = this.props.data.dataList[i];
-                console.log(newMin)
             }
             if(newMax < this.props.data.dataList[i]) {
                 newMax = this.props.data.dataList[i];
