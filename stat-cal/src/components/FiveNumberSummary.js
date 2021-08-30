@@ -102,8 +102,6 @@ export default class fiveNumberSummary extends Component {
             Q3 = this.props.data.dataList[q_3_whole - 1];
         }
 
-        console.log(this.props.data.dataList[q_3_whole - 1])
-
         let skewness 
 
         if((Q3 - Q2) > (Q2 - Q1)) {

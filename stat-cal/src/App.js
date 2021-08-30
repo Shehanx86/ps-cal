@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import FiveNumberSummary from './components/FiveNumberSummary';
+import FrequencyTable from './components/FrequencyTable';
 
 
 class Stat extends Component {
@@ -69,6 +70,8 @@ class Stat extends Component {
                 </form>
 
                 <FiveNumberSummary data={this.state}/>
+                <FrequencyTable/>
+
 
                     
             </div>
