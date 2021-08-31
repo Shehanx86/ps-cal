@@ -5,6 +5,7 @@ export default class FrequencyTable extends Component {
         super(props)
 
         this.state = {
+            disabled: false,
             dataList: '',
             frequencyList: '',
             dataListArray: [],
@@ -12,21 +13,23 @@ export default class FrequencyTable extends Component {
             totalFrequency: 0,
             totalData: 0,
             mean: 0,
-            variance: 0,
-            standard_deviation: 0
+            sampleVariance: 0,
+            populationVariance: 0
 
         }
     }
 
     handleChange1 = (e) =>{
         this.setState({
-            dataList: e.target.value
+            dataList: e.target.value,
+            disabled: false
         })
     }
 
     handleChange2 = (e) =>{
         this.setState({
-            frequencyList: e.target.value
+            frequencyList: e.target.value,
+            disabled: false
         })
     }
 
@@ -87,8 +90,7 @@ export default class FrequencyTable extends Component {
     getVariance = async () => {
         let mean = await this.getMean();
         let top = 0;
-        let totalFrequency = this.state.totalFrequency
-        let variance = 0;
+        let totalFrequency = this.state.totalFrequency;
 
         for(let i = 0; i < this.state.dataListArray.length; i++){
             top += ((this.state.dataListArray[i] - mean)*(this.state.dataListArray[i] - mean))*this.state.frequencyListArray[i];
@@ -96,10 +98,12 @@ export default class FrequencyTable extends Component {
 
         console.log(top)
 
-        variance = top/(totalFrequency-1);
+        let sampleVariance = top/(totalFrequency-1);
+        let populationVariance = top/(totalFrequency);
 
         this.setState({
-            variance: variance
+            sampleVariance: sampleVariance,
+            populationVariance: populationVariance
         })
     }
 
@@ -109,7 +113,12 @@ export default class FrequencyTable extends Component {
         this.frequencyListArrayCreate();
         this.getVariance();
 
+        this.setState({
+            disabled: true
+        })
+
     }
+
 
     render() {
         return (
@@ -118,25 +127,65 @@ export default class FrequencyTable extends Component {
                     <hr/>
                     <d1 className="row">
                     <form>
-                        
-                        <dd className="col-sm-3">Input data list</dd>
+                    <p>Type your data list and frequency list inside relevant input fields respectively, separated with commas. Dont put spaces </p>
+                        <p>eg: data list - <i>1,2,3,4,5   </i>
+                        frequency list -  <i>6,7,8,9,10</i></p>
+                        <dd className="col-sm-3">Input data list:</dd>
                         <dd className="col-sm-9"><input type='text' id='dataList' onChange={this.handleChange1}/></dd>
 
-                        <dd className="col-sm-3">Input frequency list</dd>
+                        <dd className="col-sm-3">Input frequency list:</dd>
                         <dd className="col-sm-9"><input type='text' id='frequencyList' onChange={this.handleChange2}/></dd>
                         
-                        <button className='btn btn-success' onClick={this.submitHandler}>Get Answers</button>
+                        <button className='btn btn-success' disabled={this.state.disabled} onClick={this.submitHandler}>Get Answers</button>
                         <br/>
                         <br/>
+
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                <th scope="col">x</th>
+                                <th scope="col">frequency</th>
+                                <th scope="col">fx</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                  
+                                {this.state.dataListArray.map((x, i) => (
+
+                                        <tr key={i}>
+                                        <td scope="row">{x}</td>
+                                        <td scope="row">{this.state.frequencyListArray[i]}</td>
+                                        <th scope="row">{this.state.frequencyListArray[i]*x}</th>
+                                        </tr>
+                                      
+                                  ))} 
+                                        <tr>
+                                        <th scope="row">Σ(x) = {this.state.totalData}</th>
+                                        <th scope="row">Σ(f) = {this.state.totalFrequency}</th>
+                                        <th scope="row">Σ(fx) = {this.state.totalFrequency*this.state.totalData}</th>
+                                        </tr>   
+
+                            </tbody>
+                            </table>
 
                         <dt className="col-sm-3">Mean</dt>
-                        <dd className="col-sm-9">{this.state.mean}</dd>
-
+                        <dd className="col-sm-9">Σ(fx)/Σ(f) = {this.state.mean}</dd>
+                        <br/>
+                        <p>If the question does not mention if sample or population, GET SAMPLE VALUES. DEFAULT IS SAMPLE</p>
+                        <h3>IF DATA SET IS SAMPLE</h3>
                         <dt className="col-sm-3">Variance</dt>
-                        <dd className="col-sm-9">{this.state.variance}</dd>
+                        <dd className="col-sm-9">{this.state.sampleVariance}</dd>
 
                         <dt className="col-sm-3">Standerd deviation</dt>
-                        <dd className="col-sm-9">{this.state.standard_deviation}</dd>
+                        <dd className="col-sm-9">{Math.sqrt(this.state.sampleVariance)}</dd>
+                        <br/>
+                        
+                        <h3>IF DATA SET IS POPULATION</h3>
+                        <dt className="col-sm-3">Variance</dt>
+                        <dd className="col-sm-9">{this.state.populationVariance}</dd>
+
+                        <dt className="col-sm-3">Standerd deviation</dt>
+                        <dd className="col-sm-9">{Math.sqrt(this.state.populationVariance)}</dd>
 
                     </form>
                     </d1>

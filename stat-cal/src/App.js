@@ -8,27 +8,32 @@ class Stat extends Component {
         super(props);
         
         this.state = { 
+            disabled1: false,
             dataSet: '',
             dataList: [], //sorted list
             total: 0,
             mean: 0,
-            variance: 0,
-            standard_deviation: 0,
+            populationSD: 0,
+            sampleSD: 0,
+            sampleVariance: 0,
+            populationVariance: 0,
             Q1: 0,
             Q2: 0,
             Q3: 0,
             upperBound: 0,
             lowerBound: 0,
-            skewness: '',
+            skewness: '0',
             min: 0,
             max: 0,
             range: 0,
+            outliers: '0',
+            list: '0'
 
         }
     }
 
     handleChange = (e) => {    
-        this.setState({dataSet: e.target.value});  
+        this.setState({dataSet: e.target.value, disabled1: false});  
     }
 
     setArray = () => {
@@ -52,30 +57,33 @@ class Stat extends Component {
     }
 
     calculateMeanTotalVarianceSD = async () => {
-
+        
         await this.setArray();
 
         let temp = this.state.dataList
         let total = this.state.total;
         let mean = 0;
         let top = 0;
-        let variance = 0;
-        let SD = 0;
 
         for (var a in temp) {
             top = top + ((temp[a] -  total/temp.length)*(temp[a] -  total/temp.length));
         }
 
         mean = total/temp.length;
-        variance = top/(temp.length-1);
-        SD = Math.sqrt(top/(temp.length-1));
+        let sampleVariance = top/(temp.length-1);
+        let populationVariance = top/(temp.length);
+        let sampleSD = Math.sqrt(top/(temp.length-1));
+        let populationSD = Math.sqrt(top/(temp.length));
+
 
 
         this.setState({
             total: total,
             mean: mean,
-            variance: variance,
-            standard_deviation: SD
+            populationVariance: populationVariance,
+            sampleVariance: sampleVariance,
+            sampleSD: sampleSD,
+            populationSD: populationSD
           });
     }
 
@@ -111,7 +119,6 @@ class Stat extends Component {
 
             Q1 = this.state.dataList[q_1_whole - 1] + (q_1_decimal * (this.state.dataList[q_1_whole] - this.state.dataList[q_1_whole - 1]));
             Q2 = this.state.dataList[q_2_whole - 1] + (q_2_decimal * (this.state.dataList[q_2_whole] - this.state.dataList[q_2_whole - 1]));
-            console.log(this.state.dataList[q_2_whole - 1])
             Q3 = this.state.dataList[q_3_whole - 1] + (q_3_decimal * (this.state.dataList[q_3_whole] - this.state.dataList[q_3_whole - 1]));
 
         let skewness 
@@ -135,9 +142,34 @@ class Stat extends Component {
         })
     }
 
+    getOutliers = async () => {
+        await this.quartile();
+        
+        let outliers = '';
+
+        for (let i = 0; i < this.state.dataList.length; i++){
+            if (this.state.lowerBound > this.state.dataList[i]){
+                outliers = outliers + this.state.dataList[i] + ', '
+            } 
+            if (this.state.upperBound < this.state.dataList[i]){
+                outliers = outliers + this.state.dataList[i] + ', '
+            } 
+        }
+        if(outliers == '') {
+            outliers = 'No outliers'
+        } else {
+            outliers = outliers.slice(0, -1);
+            outliers = outliers.slice(0, -1);
+        }
+
+        this.setState({
+            outliers: outliers
+        })
+    }
+
     maxMinRange = async () => {
 
-        await this.quartile();
+        await this.getOutliers();
         
         let newMin = this.state.dataList[0];
         let newMax = this.state.dataList[0];
@@ -159,28 +191,55 @@ class Stat extends Component {
         })
     }
 
+    getList = async () => {
+        await this.maxMinRange();
+
+        let list = '';
+
+        for (let i = 0; i < this.state.dataList.length; i++){
+            list = list + this.state.dataList[i] + ', ';
+        }
+
+        list = list.slice(0, -1);
+        list = list.slice(0, -1);
+
+        this.setState({
+            list: list
+        })
+    }
+
 
     submitHandler = (e) => {
         e.preventDefault();
-        this.maxMinRange();
+        this.getList();
 
+        this.setState({
+            disabled1: true
+        })
     }
 
     render() { 
         return ( 
             <div className="container">
-                       <h4>For data sets</h4>
+
+                <p><b>NOTE: </b>All the calculations are done using the formulas we were taught in lectures. Good luck with your mid-exam! <br/><i>work by - <a href="https://shehanx86.github.io/">Shehan bossa</a></i></p>
+
+                       <h4>For Data Lists</h4>
                     <hr/>
                     <d1 className="row">
                     <form>
-                        
-                        <dd className="col-sm-3">Input data set</dd>
+                    <p>Type your data set separated with commas. Dont put spaces </p>
+                        <p>eg: <i>12,25,14,2,4 </i>
+                        or <i>12.54,25,1.4,2,4.78</i></p>
+                        <dd className="col-sm-3">Input data set:</dd>
                         <dd className="col-sm-9"><input type='text' id='dataSet' onChange={this.handleChange}/></dd>
+        
+                        <button className='btn btn-success' disabled={this.state.disabled1} onClick={this.submitHandler}>Get Answers</button>
+                        <br/>
+                        <br/>
 
                         <dd className="col-sm-3">Your date set in ascending order</dd>
-                        <dd className="col-sm-9">{this.state.Array1}</dd>
-
-                        <button className='btn btn-success' onClick={this.submitHandler}>submit</button>
+                        <dd className="col-sm-9">{this.state.list}</dd>
 
                         <dt className="col-sm-3">Max</dt>
                         <dd className="col-sm-9">{this.state.max}</dd>
@@ -197,16 +256,10 @@ class Stat extends Component {
                         <dt className="col-sm-3">Mean</dt>
                         <dd className="col-sm-9">{this.state.mean}</dd>
 
-                        <dt className="col-sm-3">Variance</dt>
-                        <dd className="col-sm-9">{this.state.variance}</dd>
-
-                        <dt className="col-sm-3">Standerd deviation</dt>
-                        <dd className="col-sm-9">{this.state.standard_deviation}</dd>
-
                         <dt className="col-sm-3">Q1</dt>
                         <dd className="col-sm-9">{this.state.Q1}</dd>
 
-                        <dt className="col-sm-3">Q2</dt>
+                        <dt className="col-sm-3">Q2 (Median)</dt>
                         <dd className="col-sm-9">{this.state.Q2}</dd>
 
                         <dt className="col-sm-3">Q3</dt>
@@ -221,8 +274,23 @@ class Stat extends Component {
                         <dt className="col-sm-3">Lower bound</dt>
                         <dd className="col-sm-9">{this.state.lowerBound}</dd>
 
+                        <dt className="col-sm-3">Outliers</dt>
+                        <dd className="col-sm-9">{this.state.outliers}</dd>
+
                         <dt className="col-sm-3">Skeweness</dt>
                         <dd className="col-sm-9">{this.state.skewness}</dd>
+
+                        <dt className="col-sm-3">Variance (SAMPLE)</dt>
+                        <dd className="col-sm-9">{this.state.sampleVariance}</dd>
+
+                        <dt className="col-sm-3">Standerd deviation (SAMPLE)</dt>
+                        <dd className="col-sm-9">{Math.sqrt(this.state.sampleVariance)}</dd>
+
+                        <dt className="col-sm-3">Variance (POPULATION)</dt>
+                        <dd className="col-sm-9">{this.state.populationVariance}</dd>
+
+                        <dt className="col-sm-3">Standerd deviation (POPULATION)</dt>
+                        <dd className="col-sm-9">{Math.sqrt(this.state.populationVariance)}</dd>
 
 
                     </form>
